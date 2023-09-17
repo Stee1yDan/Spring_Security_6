@@ -1,7 +1,6 @@
-package com.example.spring_seecurity_6.config;
+package com.example.spring_security_6.config;
 
-
-import com.example.spring_seecurity_6.repository.UserRepository;
+import com.example.spring_security_6.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,8 +8,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,29 +17,30 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @RequiredArgsConstructor
 public class ApplicationConfig
 {
-    private final UserRepository userRepository;
+
+    private final UserRepository repository;
 
     @Bean
     public UserDetailsService userDetailsService()
     {
-        return username -> userRepository.findByEmail(username)
+        return username -> repository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
     }
 
     @Bean
     public AuthenticationProvider authenticationProvider()
     {
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService());
-        authenticationProvider.setPasswordEncoder(passwordEncoder());
-        return authenticationProvider;
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService());
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
+            throws Exception
     {
-        return configuration.getAuthenticationManager();
+        return config.getAuthenticationManager();
     }
 
     @Bean
@@ -50,4 +48,5 @@ public class ApplicationConfig
     {
         return new BCryptPasswordEncoder();
     }
+
 }

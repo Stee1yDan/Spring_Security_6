@@ -1,5 +1,6 @@
-package com.example.spring_seecurity_6.auth;
+package com.example.spring_security_6.auth;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +10,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthenticationResponse
+public class AuthResponse
 {
+
     private String token;
 }

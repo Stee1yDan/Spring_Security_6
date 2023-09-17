@@ -1,4 +1,4 @@
-package com.example.spring_seecurity_6.auth;
+package com.example.spring_security_6.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,9 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthenticationRequest
-{
+public class AuthRequest {
 
     private String email;
-    private String password;
+    String password;
 }

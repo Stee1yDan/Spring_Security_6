@@ -1,4 +1,4 @@
-package com.example.spring_seecurity_6.config;
+package com.example.spring_security_6.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -15,12 +15,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig
 {
-    private final JwtAuthFilter jwtAuthFilter;
+    private final JwtAuthFilter authFilter;
     private final AuthenticationProvider authenticationProvider;
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception //Tell me why!!
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception
     {
-        httpSecurity
+        return http
                 .csrf()
                 .disable()
                 .authorizeHttpRequests()
@@ -33,7 +33,6 @@ public class SecurityConfig
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-        return httpSecurity.build();
+                .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class).build();
     }
 }

@@ -1,5 +1,6 @@
-package com.example.spring_seecurity_6.auth;
+package com.example.spring_security_6.auth;
 
+import com.example.spring_security_6.user.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,11 +10,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterRequest
-{
+public class RegisterRequest {
+
     private String firstname;
     private String lastname;
     private String email;
     private String password;
-
+    private Role role;
 }

@@ -1,18 +1,16 @@
-package com.example.spring_seecurity_6.config;
+package com.example.spring_security_6.config;
 
-import com.example.spring_seecurity_6.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
-import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -25,46 +23,39 @@ public class JwtAuthFilter extends OncePerRequestFilter
 {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
-
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
-                                    @NonNull FilterChain filterChain) throws ServletException, IOException
+                                    @NonNull FilterChain filterChain)
+            throws ServletException, IOException
     {
         final String authHeader = request.getHeader("Authorization");
         final String jwtToken;
-        final String email;
 
-        if (authHeader == null || !authHeader.startsWith("Bearer"))
+        if (authHeader == null || !authHeader.startsWith("Bearer "))
         {
-            filterChain.doFilter(request, response);
+            filterChain.doFilter(request,response);
             return;
         }
 
-        jwtToken = authHeader.substring(7);
-        email = jwtService.extractUsername(jwtToken); //TODO extract user email
+        final String userEmail;
 
-        if (email != null
-                && SecurityContextHolder.getContext().getAuthentication() == null)
+        jwtToken = authHeader.substring(7);
+        userEmail = jwtService.extractUsername(jwtToken);
+
+        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null)
         {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(email);
-            if (jwtService.isTokenValid(jwtToken, userDetails))
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+
+            if (jwtService.isTokenValid(jwtToken,userDetails))
             {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken
-                        (
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities()
-                        );
-                authToken.setDetails
-                        (
-                                new WebAuthenticationDetailsSource().buildDetails(request)
-                        );
+                UsernamePasswordAuthenticationToken authToken =
+                        new UsernamePasswordAuthenticationToken(userDetails, null,userDetails.getAuthorities());
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
 
         filterChain.doFilter(request,response);
-
     }
 }

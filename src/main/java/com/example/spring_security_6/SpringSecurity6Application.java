@@ -1,15 +1,15 @@
-package com.example.spring_seecurity_6;
+package com.example.spring_security_6;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SpringSeecurity6Application
+public class SpringSecurity6Application
 {
 
     public static void main(String[] args)
     {
-        SpringApplication.run(SpringSeecurity6Application.class, args);
+        SpringApplication.run(SpringSecurity6Application.class, args);
     }
 
 }
