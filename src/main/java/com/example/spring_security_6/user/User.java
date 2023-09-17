@@ -1,6 +1,7 @@
 package com.example.spring_security_6.user;
 
 
+import com.example.spring_security_6.token.Token;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
@@ -43,6 +44,9 @@ public class User implements UserDetails
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    @OneToMany(mappedBy = "user") // TODO: Check later
+    private List<Token> tokens;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities()

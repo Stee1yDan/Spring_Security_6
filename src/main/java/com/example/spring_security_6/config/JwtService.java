@@ -1,10 +1,12 @@
 package com.example.spring_security_6.config;
 
+import com.example.spring_security_6.repository.TokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -17,9 +19,11 @@ import java.util.Objects;
 import java.util.function.Function;
 
 @Service
+@RequiredArgsConstructor
 public class JwtService
 {
     private static final String SECRET_KEY = "857df0bfc0b8df296a247bf97b7f5b3f32e48f6c740249e7acdc18057d8ba6df";
+    private final TokenRepository tokenRepository;
     public String extractUsername(String token)
     {
         return extractClaim(token, Claims::getSubject);
@@ -48,8 +52,11 @@ public class JwtService
 
     public boolean isTokenValid(String token, UserDetails userDetails)
     {
+        var isTokenValid = tokenRepository.findByToken(token)
+                .map(t -> !t.isExpired() && !t.isRevoked())
+                .orElse(false);
         final String username = extractUsername(token);
-        return username.equals(userDetails.getUsername()) && isTokenNonExpired(token);
+        return username.equals(userDetails.getUsername()) && isTokenNonExpired(token) && isTokenValid;
     }
 
     public boolean isTokenNonExpired(String token)

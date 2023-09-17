@@ -1,5 +1,7 @@
 package com.example.spring_security_6.config;
 
+import com.example.spring_security_6.repository.TokenRepository;
+import com.example.spring_security_6.token.Token;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
