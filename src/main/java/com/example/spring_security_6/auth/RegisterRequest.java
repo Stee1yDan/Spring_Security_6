@@ -16,5 +16,5 @@ public class RegisterRequest {
     private String lastname;
     private String email;
     private String password;
-    private Role role;
+    private Role role; //TODO: Implement Role Management
 }
