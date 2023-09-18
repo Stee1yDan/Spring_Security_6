@@ -22,7 +22,16 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class JwtService
 {
-    private static final String SECRET_KEY = "857df0bfc0b8df296a247bf97b7f5b3f32e48f6c740249e7acdc18057d8ba6df";
+
+
+    @Value("${application.security.jwt.secretKey}")
+    private String secretKey;
+
+    @Value("${application.security.jwt.expiration}")
+    private Long jwtExpiration;
+
+    @Value("${application.security.jwt.refresh-token.expiration}")
+    private Long refreshExpiration;
     private final TokenRepository tokenRepository;
     public String extractUsername(String token)
     {
@@ -41,11 +50,21 @@ public class JwtService
 
     public String generateToken(Map<String, Objects> extraClaims, UserDetails userDetails)
     {
+        return buildToken(extraClaims, userDetails, jwtExpiration);
+    }
+
+    public String generateRefreshToken(UserDetails userDetails)
+    {
+        return buildToken(new HashMap<>(), userDetails, refreshExpiration);
+    }
+
+    private String buildToken(Map<String, Objects> extraClaims, UserDetails userDetails, long expirationDate)
+    {
         return Jwts.builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationDate))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -57,6 +76,12 @@ public class JwtService
                 .orElse(false);
         final String username = extractUsername(token);
         return username.equals(userDetails.getUsername()) && isTokenNonExpired(token) && isTokenValid;
+    }
+
+    public boolean isRefreshTokenValid(String token, UserDetails userDetails)
+    {
+        final String username = extractUsername(token);
+        return username.equals(userDetails.getUsername()) && isTokenNonExpired(token);
     }
 
     public boolean isTokenNonExpired(String token)
@@ -80,7 +105,7 @@ public class JwtService
 
     private Key getSigningKey()
     {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }
